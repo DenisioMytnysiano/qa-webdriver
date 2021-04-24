@@ -1,0 +1,7 @@
+### Python change and webdriver logs ###
+__pycache__
+geckodriver.log
+
+### VS Code ###
+.vscode/*
+*.code-workspace
