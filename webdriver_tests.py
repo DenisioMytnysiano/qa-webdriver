@@ -7,38 +7,43 @@ from selenium.common.exceptions import TimeoutException
 WEBSITE_URL = 'https://www.kaggle.com/'
 
 
+def get_element_by_css(driver, css_selector: str, timeout: int = 10):
+    try:
+        wait = WebDriverWait(driver, timeout)
+        locator = (By.CSS_SELECTOR, css_selector)
+        return wait.until(EC.presence_of_element_located(locator))
+    except TimeoutException:
+        raise Exception("Could not find element")
+
+
 class KaggleTestCase(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
 
-    def get_with_wait(self, selector: str = None, timeout: int = 10):
-        try:
-            wait = WebDriverWait(self.driver, timeout)
-            locator = (By.CSS_SELECTOR, selector)
-            return wait.until(EC.presence_of_element_located(locator))
-        except TimeoutException:
-            raise Exception("Could not find element")
-
     def test_sign_in_button(self):
         self.driver.get(WEBSITE_URL)
-        sign_in_link = self.get_with_wait(
-            selector='a[class="sc-pBolk kPdszo"]'
+        sign_in_link = get_element_by_css(
+            driver=self.driver,
+            css_selector='a[href*="SignIn"]'
         )
         sign_in_link.click()
 
-        header = self.get_with_wait(
-            selector="span[class='sc-fznxKY sc-fznMAR cRheSr']"
+        header = get_element_by_css(
+            driver=self.driver,
+            css_selector="div span"
         )
         assert header.text == "Sign In"
 
     def test_categories(self, category: str = "Code"):
         self.driver.get(WEBSITE_URL)
-        category_button = self.get_with_wait(
-            selector=f'a[href="/{category.lower()}"]'
+        category_button = get_element_by_css(
+            driver=self.driver,
+            css_selector=f'a[href="/{category.lower()}"]'
         )
         category_button.click()
-        header = self.get_with_wait(
-            selector="h1[class='sc-fznKkj sc-fznZeY sc-pYOYC bwpFPB']"
+        header = get_element_by_css(
+            driver=self.driver,
+            css_selector="div h1"
         )
         assert header.text == "Code"
 
